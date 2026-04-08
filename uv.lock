@@ -1,0 +1,260 @@
+version = 1
+revision = 1
+requires-python = ">=3.10"
+
+[[package]]
+name = "annotated-types"
+version = "0.7.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ee/67/531ea369ba64dcff5ec9c3402f9f51bf748cec26dde048a2f973a4eea7f5/annotated_types-0.7.0.tar.gz", hash = "sha256:aff07c09a53a08bc8cfccb9c85b05f1aa9a2a6f23728d790723543408344ce89", size = 16523 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/78/b6/6307fbef88d9b5ee7421e68d78a9f162e0da4900bc5f5793f6d3d0e34fb8/annotated_types-0.7.0-py3-none-any.whl", hash = "sha256:1f02e8b43a8fbbc3f3e0d4f0f4bfc8131bcb4eebe8849b8e5c773f3a1c582a53", size = 13643 },
+]
+
+[[package]]
+name = "anyio"
+version = "4.9.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "idna" },
+    { name = "sniffio" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/95/7d/4c1bd541d4dffa1b52bd83fb8527089e097a106fc90b467a7313b105f840/anyio-4.9.0.tar.gz", hash = "sha256:673c0c244e15788651a4ff38710fea9675823028a6f08a5eda3af5015c973f17", size = 190949 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a1/ee/48ca1a7c89ffec8b6a0c5d02b89c305671d5ffd8d3c94acf8b8c408575bb/anyio-4.9.0-py3-none-any.whl", hash = "sha256:9f76d541cad6e36af7beb62e978876f3b41e3e04f2c1fbf0884604c0a9c4d93c", size = 100916 },
+]
+
+[[package]]
+name = "certifi"
+version = "2025.1.31"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/1c/ab/c9f1e32b7b1bf505bf26f0ef697775960db7932abeb7b516de589e950c4a/certifi-2025.1.31.tar.gz", hash = "sha256:3d5da6925056f6f18f119200434a4780a94263f10d1c7cf6a0b63e5cd0b491d7", size = 167577 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/38/fc/bce832fd4fd99766c04d1ee0eead6b0ec6486fb100ae5e74c1d91292b982/certifi-2025.1.31-py3-none-any.whl", hash = "sha256:ca78db4565a652026a4db2bbdf077d247f2a0a95307b65bfabb7bce3b5c58fec", size = 166393 },
+]
+
+[[package]]
+name = "click"
+version = "8.1.8"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "colorama", marker = "sys_platform == 'win32'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b9/2e/0090cbf739cee7d23781ad4b89a9894a41538e4fcf4c31dcdd705b78eb8b/click-8.1.8.tar.gz", hash = "sha256:ed53c9d8990d83c2a27deae68e4ee337473f6330c040a31d4225c9574d16096a", size = 226593 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7e/d4/7ebdbd03970677812aac39c869717059dbb71a4cfc033ca6e5221787892c/click-8.1.8-py3-none-any.whl", hash = "sha256:63c132bbbed01578a06712a2d1f497bb62d9c1c0d329b7903a866228027263b2", size = 98188 },
+]
+
+[[package]]
+name = "distro"
+version = "1.9.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/fc/f8/98eea607f65de6527f8a2e8d052291ac67a03d56a96428c55ddc45823038/distro-1.9.0.tar.gz", hash = "sha256:2fa77c6fd8940f116ee1d6b94a2d90087879d421c81fc1771f62f79a1a5c55ae", size = 44technician }
+
+[[package]]
+name = "fastapi"
+version = "0.115.12"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pydantic" },
+    { name = "starlette" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f4/55/ae499352d82338331ca1e28010e3b8a2252476b3ad6a0e37b51498b8bcb0/fastapi-0.115.12.tar.gz", hash = "sha256:e760d14f2f3e0e1f0a6305e5b42b6d1e3789d97e0234e76eff3d4fc5ddc6b55a", size = 295428 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f4/a1/a6c3f2af2e3e77d1c647a7b906e2d8e1fc5c7a22a2e47c2d0d891a3d987/fastapi-0.115.12-py3-none-any.whl", hash = "sha256:85e8d2c6e16c9ece74e1be8226bd7adab2c77a4ae38e1ded06f9ef08b6fbc7f5", size = 94768 },
+]
+
+[[package]]
+name = "fraud-detection-env"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "fastapi" },
+    { name = "httpx" },
+    { name = "openai" },
+    { name = "openenv-core" },
+    { name = "pydantic" },
+    { name = "uvicorn", extra = ["standard"] },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "fastapi", specifier = ">=0.110.0" },
+    { name = "httpx", specifier = ">=0.27.0" },
+    { name = "openai", specifier = ">=1.0.0" },
+    { name = "openenv-core", specifier = ">=0.2.0" },
+    { name = "pydantic", specifier = ">=2.0.0" },
+    { name = "uvicorn", extras = ["standard"], specifier = ">=0.29.0" },
+]
+
+[[package]]
+name = "h11"
+version = "0.14.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f5/38/3af3d3633a34a3316095b39c8e8fb4853a28a536e55d347bd8d8e9a14b03/h11-0.14.0.tar.gz", hash = "sha256:8f19fbbe99e72420ff35c00b27a34cb9937e902a8b810e2c88300c9f0a1178e6", size = 100217 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/95/04/ff642e65ad6b90db43e668d70ffb6736436c7ce41fcc549f4e9472234127/h11-0.14.0-py3-none-any.whl", hash = "sha256:e3fe4ac4b851c468cc8363d500db52c2ead036d3a386d5ad135e12b28f62c5f4", size = 58259 },
+]
+
+[[package]]
+name = "httpcore"
+version = "1.0.8"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "certifi" },
+    { name = "h11" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/9f/45/ad7e90f969a0cd2e1f3bbc8c2c55a3c1b1c8f6ef50b48c1a1c7db2fd2e8/httpcore-1.0.8.tar.gz", hash = "sha256:86b16cf0d27b9b10975e99ea24ac9a75481de3a27e46bcf3cf8e3b7faa6b6eb5", size = 85385 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b4/10/8dc3b7782b5d429d2c40d56bf0c6e0d7ab2cc7bb7b4bddc6073de22a1e65/httpcore-1.0.8-py3-none-any.whl", hash = "sha256:9f7698d6a820b15cd8c8682941e29a14a558b59b5adc3e67c4e4e1dff3fc2e1f", size = 78552 },
+]
+
+[[package]]
+name = "httpx"
+version = "0.28.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+    { name = "certifi" },
+    { name = "httpcore" },
+    { name = "idna" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b1/df/48c586a5fe32a0f01324ee087459e112ebb7224f646c0b173fed48808a03/httpx-0.28.1.tar.gz", hash = "sha256:75e98c5f16b0f35b567856f597f06ff2270a374470a5c2392242528e3e3e42fc", size = 141406 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2a/39/e50c7c3a983047577ee07d2a9e53faf5a69493943ec3f6a384bdc792deb2/httpx-0.28.1-py3-none-any.whl", hash = "sha256:d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad", size = 73517 },
+]
+
+[[package]]
+name = "idna"
+version = "3.10"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f1/70/7703c29685631f5a7590aa73f1f1d3fa9a4c74262d5b8acf2c5c7c1a6e0/idna-3.10.tar.gz", hash = "sha256:12f65c9b470abda6dc35cf5e1d1317a3908d6ffa081f0e4f6c0b4c5e2f4b29b8", size = 190490 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/76/c6/c88e154df9c4e1a2a66ccf0005a88dfb2650c1dffb6f5ce603dfbd452ce3/idna-3.10-py3-none-any.whl", hash = "sha256:946d195a0d259cbba61165e88e65941f16e9b36ea6ddb97f00452bae8b1287d3", size = 70442 },
+]
+
+[[package]]
+name = "jiter"
+version = "0.9.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/21/b4/c6ec7c1f6bbc6a8a7dec350d60f68e71b4f73bc6636820cd6c3b3e92a9e9/jiter-0.9.0.tar.gz", hash = "sha256:aaa9c2cc5df573de2e3d77baa6f3e66c5e7c4e07a6c51f3d70e0659d6e87d62e", size = 162630 }
+
+[[package]]
+name = "openai"
+version = "1.77.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+    { name = "certifi" },
+    { name = "distro" },
+    { name = "httpx" },
+    { name = "jiter" },
+    { name = "pydantic" },
+    { name = "sniffio" },
+    { name = "tqdm" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d5/f5/b8c4b4f43d0b6b0a5c7e1e6b7f6a6c2e6a4e5e7a5e8f5c8d3a1b2e3c5d6/openai-1.77.0.tar.gz", hash = "sha256:placeholder", size = 389234 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/openai-1.77.0-py3-none-any.whl", hash = "sha256:placeholder", size = 631234 },
+]
+
+[[package]]
+name = "openenv-core"
+version = "0.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "fastapi" },
+    { name = "pydantic" },
+    { name = "pyyaml" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/openenv_core-0.2.0.tar.gz", hash = "sha256:placeholder", size = 12345 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/openenv_core-0.2.0-py3-none-any.whl", hash = "sha256:placeholder", size = 12345 },
+]
+
+[[package]]
+name = "pydantic"
+version = "2.11.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "annotated-types" },
+    { name = "pydantic-core" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/77/ab/5250d56ad03884ab5efd07f734203943c8a8ab40d551e208af81d0257b68/pydantic-2.11.4.tar.gz", hash = "sha256:32738d19d63dc8f5b8a652d5d17c4ad0e66be7f07c769c6e3c64fd82a3fc1451", size = 785513 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e5/a4/dce4a87cb3db35bf2e52a6c18dba0ea8e0dc3b9c4eed440e2d2c2aa73019/pydantic-2.11.4-py3-none-any.whl", hash = "sha256:7493fef090736e9b879f0f7f9f5f62da4b5f27c0c2e1ce2eb27f16da2a623a5e", size = 444943 },
+]
+
+[[package]]
+name = "pydantic-core"
+version = "2.33.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ad/b7/a4933f73b6d3e34c2bdb2e9b7d393ed3bbdb2e0b7e87cba91839e8048cf3/pydantic_core-2.33.2.tar.gz", hash = "sha256:placeholder", size = 430503 }
+
+[[package]]
+name = "pyyaml"
+version = "6.0.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/54/ed/79a089b6be93607fa5cdaedf301d7dfb23af5f25c398d5ead2525b063e17/pyyaml-6.0.2.tar.gz", hash = "sha256:d584d9ec91ad65861cc08d42e834324ef3cb01b17d602e3f36637b21d9ef8e42", size = 162123 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f8/aa/7af4e81f7acba21a4c6be026da38fd2b872ca46226673c89a758ebdc4fd2/PyYAML-6.0.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:8b9c7197f7cb2738065851b5aed657f4306c6fe03b4f755c9019f3b3bbe66cd0", size = 762952 },
+]
+
+[[package]]
+name = "sniffio"
+version = "1.3.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a2/87/a6771e1546d97e7e041b6ae58d80074f81b7d5121207425c964dbe5cdc3d/sniffio-1.3.1.tar.gz", hash = "sha256:f4324edc670a0f49750a81b895f35c3a939d4a1a16f2e9f53a8c0ec4ee1a1f48", size = 20372 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e9/44/75a9c9421471a6c4805dbf2356f7c181a29c1879239abab1ea2cc8f38b40/sniffio-1.3.1-py3-none-any.whl", hash = "sha256:2f6da418d1f1e0fddd844478f41680e794e6051915791a034ff65e5f100525a2", size = 10235 },
+]
+
+[[package]]
+name = "starlette"
+version = "0.46.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ce/3d/e24fcf0051d002e44c5c65a2d9f28ee8a1e5f62e8e4553c95fe0e7a3a8e0/starlette-0.46.2.tar.gz", hash = "sha256:placeholder", size = 78437 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/starlette-0.46.2-py3-none-any.whl", hash = "sha256:placeholder", size = 72437 },
+]
+
+[[package]]
+name = "tqdm"
+version = "4.67.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a8/4b/29b4ef32e036bb34e4ab51796dd745cdba7ed47ad142a9f4a1eb8e0c744d/tqdm-4.67.1.tar.gz", hash = "sha256:f8aef9c52c08c13a65f30ea34f4e5aac3fd1a34959879d7e59e63027286627f2", size = 169737 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d0/30/dc54f88dd4a2b5dc8a0279bdd7270e735851848b762adc1ed5672ad1b1ee/tqdm-4.67.1-py3-none-any.whl", hash = "sha256:26445eca388f82e72884143a18120cd8b9397f657bf3a9ec7e4de7e1f58eff7a", size = 78551 },
+]
+
+[[package]]
+name = "typing-extensions"
+version = "4.13.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f6/37/23083fcd6e35492953e8d2aaaa68b860eb422b34627b13f2ce3eb6106061/typing_extensions-4.13.2.tar.gz", hash = "sha256:e6c81219daef2d0a5f6f5f58f7c3c27d9c0a2c6f24c1f7cb0a3baf57f75e22c", size = 106705 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8b/54/b1ae86c0973cc6f0210b2d3c5af12a25da2a9c9fd15e9f7c21b62a65e4a/typing_extensions-4.13.2-py3-none-any.whl", hash = "sha256:a439e7c04b49fec3e5d3e2beaa21755cadbbdc391694e28ccdd36ca4a1e46519", size = 45806 },
+]
+
+[[package]]
+name = "uvicorn"
+version = "0.34.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "click" },
+    { name = "h11" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/uvicorn-0.34.2.tar.gz", hash = "sha256:placeholder", size = 76823 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/uvicorn-0.34.2-py3-none-any.whl", hash = "sha256:placeholder", size = 62823 },
+]

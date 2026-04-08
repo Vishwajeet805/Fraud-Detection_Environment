@@ -1,0 +1,115 @@
+name: fraud-detection-env
+version: "0.1.0"
+description: >
+  Adaptive Phishing & Fraud Detection Environment.
+  An AI agent learns to classify messages as Safe, Fraud, or Suspicious
+  under realistic cybersecurity conditions with dynamic difficulty adaptation.
+
+tags:
+  - openenv
+  - fraud-detection
+  - phishing
+  - cybersecurity
+  - classification
+  - reinforcement-learning
+
+author: Fraud Detection OpenEnv Team
+license: MIT
+
+environment:
+  entry_point: "app:app"
+  server_entry_point: "server.app:main"
+  framework: fastapi
+  python_requires: ">=3.10"
+
+observation_space:
+  type: object
+  description: "Structured observation including message text, URL, sender, and extracted features."
+  fields:
+    message_text:
+      type: string
+      description: "Raw message or transaction text."
+    url:
+      type: string
+      description: "URL contained in the message (empty if none)."
+    sender:
+      type: string
+      description: "Sender identifier (email, phone number, or short code)."
+    extracted_features:
+      type: object
+      fields:
+        has_urgent_words: {type: boolean}
+        has_financial_keywords: {type: boolean}
+        suspicious_domain_score: {type: number, minimum: 0, maximum: 1}
+        message_length: {type: integer, minimum: 0}
+        has_external_links: {type: boolean}
+        sender_reputation_score: {type: number, minimum: 0, maximum: 1}
+    step_count: {type: integer}
+    task_name: {type: string}
+    difficulty: {type: string, enum: [easy, medium, hard]}
+    max_steps: {type: integer}
+    action_history: {type: array, items: {type: integer}}
+    reward_history: {type: array, items: {type: number}}
+
+action_space:
+  type: integer
+  description: "Classification decision: 0=Safe, 1=Fraud, 2=Suspicious"
+  values:
+    0: "Safe — message is legitimate"
+    1: "Fraud — message is definitively fraudulent"
+    2: "Suspicious — message requires further scrutiny"
+
+reward:
+  type: number
+  minimum: -1.7
+  maximum: 1.2
+  description: >
+    Shaped reward providing dense signal throughout the episode.
+    Correct classification: +1.0
+    Fraud flagged as Suspicious: +0.6 (partial)
+    Safe flagged as Suspicious: +0.3 (overcautious)
+    Missed fraud (Fraud→Safe): -1.5 (critical penalty)
+    Wrong classification: -1.0
+    Streak bonuses and repetition penalties additionally applied.
+
+tasks:
+  - name: easy_fraud_detection
+    description: "Detect obvious fraud: scam messages with clear red flags vs. legitimate notifications."
+    difficulty: easy
+    num_samples: 15
+    passing_threshold: 0.75
+    expected_score_range: [0.7, 1.0]
+
+  - name: medium_risk_analysis
+    description: "Classify semi-realistic phishing with mixed signals. Includes Suspicious borderline labels."
+    difficulty: medium
+    num_samples: 15
+    passing_threshold: 0.65
+    expected_score_range: [0.5, 0.85]
+
+  - name: hard_decision_making
+    description: >
+      Near-perfect phishing with professional tone, plausible domains, and subtle differences.
+      Designed to challenge frontier models.
+    difficulty: hard
+    num_samples: 15
+    passing_threshold: 0.55
+    expected_score_range: [0.3, 0.7]
+
+endpoints:
+  reset:
+    method: POST
+    path: /reset
+    description: "Initialize a new episode. Optionally specify task_name."
+  step:
+    method: POST
+    path: /step
+    description: "Apply agent action and advance environment."
+  state:
+    method: GET
+    path: /state
+    description: "Return full current environment state."
+  health:
+    method: GET
+    path: /health
+    description: "Health check endpoint."
