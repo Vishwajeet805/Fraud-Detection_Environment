@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #060a12;
+}
+
+.glass-card {
+  @apply rounded-2xl border border-white/10 bg-panel/70 shadow-soft backdrop-blur-xl;
+}
+
+.metric-label {
+  @apply text-xs uppercase tracking-[0.18em] text-slate-400;
+}
