@@ -190,3 +190,199 @@ HARD_TASK_CONFIG = {
     "passing_threshold": 0.55,
     "samples": HARD_SAMPLES,
 }
+
+# ── Multi-step task: 5 scenarios × 3 sub-steps = 15 total agent decisions ──
+
+HARD_MULTI_STEP_SAMPLES = [
+
+    # Scenario 1: SBI account-compromise escalation (Suspicious → Fraud → Fraud)
+    {
+        "steps": [
+            {
+                "message_text": (
+                    "We noticed a sign-in to your SBI account from a new device in Hyderabad. "
+                    "If this was you, no action is needed. Otherwise, please review your account."
+                ),
+                "url": "",
+                "sender": "SBI-Alerts",
+                "label": 2,
+                "explanation": "Plausible short-code sender; no link yet — low signal, warrants watch.",
+            },
+            {
+                "message_text": (
+                    "To secure your account following the unauthorized access attempt, please "
+                    "verify your credentials via the link below within 30 minutes."
+                ),
+                "url": "https://sbi-secure-login.co.in/verify?session=a8f2c",
+                "sender": "security@sbi-secure-login.co.in",
+                "label": 1,
+                "explanation": "sbi-secure-login.co.in ≠ sbi.co.in — domain impersonation confirmed.",
+            },
+            {
+                "message_text": (
+                    "An OTP has been sent to your registered mobile to complete account "
+                    "verification. Enter it on the secure page to restore full account access."
+                ),
+                "url": "https://sbi-secure-login.co.in/otp-confirm",
+                "sender": "otp@sbi-secure-login.co.in",
+                "label": 1,
+                "explanation": "OTP harvest on the same fake domain — final fraud step.",
+            },
+        ]
+    },
+
+    # Scenario 2: IT Department refund phishing chain (Suspicious → Fraud → Fraud)
+    {
+        "steps": [
+            {
+                "message_text": (
+                    "Income Tax Department: A refund of ₹14,320 for FY 2023-24 is pending "
+                    "processing for your PAN. Please ensure your bank details are up to date."
+                ),
+                "url": "",
+                "sender": "+91-9845001234",
+                "label": 2,
+                "explanation": "Real IT Dept uses incometax.gov.in mail; phone-number sender is a soft red flag.",
+            },
+            {
+                "message_text": (
+                    "Your refund could not be auto-credited due to a bank account mismatch. "
+                    "Re-submit your account details at the e-Filing portal to receive the amount."
+                ),
+                "url": "https://efiling-incometax.co.in/refund-resubmit",
+                "sender": "refunds@efiling-incometax.co.in",
+                "label": 1,
+                "explanation": "efiling-incometax.co.in is not incometax.gov.in — fake portal.",
+            },
+            {
+                "message_text": (
+                    "OTP verification required to update bank account for refund credit. "
+                    "Enter the OTP sent to your registered mobile on the refund portal."
+                ),
+                "url": "https://efiling-incometax.co.in/otp-verify",
+                "sender": "noreply@efiling-incometax.co.in",
+                "label": 1,
+                "explanation": "OTP capture step on same fraudulent domain — completes credential theft.",
+            },
+        ]
+    },
+
+    # Scenario 3: Advance-fee loan fraud — clear fraud throughout (Fraud → Fraud → Fraud)
+    {
+        "steps": [
+            {
+                "message_text": (
+                    "Congratulations! You have been pre-approved for an HDFC personal loan "
+                    "of ₹5,00,000 at 10.5% interest. No documents required. Apply now."
+                ),
+                "url": "https://hdfc-quickloan.in/apply",
+                "sender": "loans@hdfc-quickloan.in",
+                "label": 1,
+                "explanation": "hdfc-quickloan.in ≠ hdfcbank.com; unsolicited pre-approval is a scam pattern.",
+            },
+            {
+                "message_text": (
+                    "Your loan has been approved. To disburse ₹5,00,000 to your account, "
+                    "a one-time processing fee of ₹2,500 is required. Pay via the link below."
+                ),
+                "url": "https://hdfc-quickloan.in/pay-fee",
+                "sender": "disbursal@hdfc-quickloan.in",
+                "label": 1,
+                "explanation": "Advance fee fraud — legitimate banks never collect fees upfront via SMS.",
+            },
+            {
+                "message_text": (
+                    "Fee payment confirmed. To release the loan amount, please share the OTP "
+                    "received on your mobile to authenticate the NEFT transfer."
+                ),
+                "url": "https://hdfc-quickloan.in/otp",
+                "sender": "release@hdfc-quickloan.in",
+                "label": 1,
+                "explanation": "OTP steal follows advance fee payment — completes the scam.",
+            },
+        ]
+    },
+
+    # Scenario 4: Legitimate ICICI banking chain — all safe (Safe → Safe → Safe)
+    {
+        "steps": [
+            {
+                "message_text": (
+                    "ICICI Bank: A transaction of ₹8,200 has been made on your credit card "
+                    "ending 4521 at Swiggy on Dec 20. Available limit: ₹91,800."
+                ),
+                "url": "",
+                "sender": "alerts@icicibank.com",
+                "label": 0,
+                "explanation": "Official icicibank.com sender, no link, routine transaction alert.",
+            },
+            {
+                "message_text": (
+                    "Your ICICI Bank credit card statement for December is ready. "
+                    "Total due: ₹24,310. Minimum due: ₹1,200. Due date: January 5, 2025."
+                ),
+                "url": "https://www.icicibank.com/personal-banking/cards",
+                "sender": "creditcards@icicibank.com",
+                "label": 0,
+                "explanation": "Official domain, standard billing notification with correct URL.",
+            },
+            {
+                "message_text": (
+                    "Payment of ₹24,310 received for your ICICI Bank credit card ending 4521. "
+                    "Thank you. Your updated available limit is ₹1,16,110."
+                ),
+                "url": "https://www.icicibank.com",
+                "sender": "creditcards@icicibank.com",
+                "label": 0,
+                "explanation": "Routine payment confirmation from official domain.",
+            },
+        ]
+    },
+
+    # Scenario 5: UIDAI Aadhaar phishing — starts ambiguous, escalates (Suspicious → Fraud → Fraud)
+    {
+        "steps": [
+            {
+                "message_text": (
+                    "UIDAI: Your Aadhaar-linked mobile number will be deactivated in 48 hours "
+                    "due to a mandatory regulatory update. Retain linkage by re-verifying."
+                ),
+                "url": "",
+                "sender": "+91-9700112233",
+                "label": 2,
+                "explanation": "UIDAI communicates via uidai.gov.in, not random phone numbers — suspicious.",
+            },
+            {
+                "message_text": (
+                    "Complete your Aadhaar mobile re-verification at the UIDAI self-service portal "
+                    "to prevent deactivation. The process takes under 2 minutes."
+                ),
+                "url": "https://uidai-selfservice.in/mobile-reverify",
+                "sender": "noreply@uidai-selfservice.in",
+                "label": 1,
+                "explanation": "uidai-selfservice.in ≠ uidai.gov.in — fake government portal.",
+            },
+            {
+                "message_text": (
+                    "Enter your 12-digit Aadhaar number and the OTP sent to your mobile to "
+                    "complete re-verification and retain your registered mobile linkage."
+                ),
+                "url": "https://uidai-selfservice.in/otp-verify",
+                "sender": "verify@uidai-selfservice.in",
+                "label": 1,
+                "explanation": "Aadhaar number + OTP harvest — identity theft completion step.",
+            },
+        ]
+    },
+]
+
+HARD_MULTI_STEP_TASK_CONFIG = {
+    "name": "hard_multi_step",
+    "description": (
+        "Multi-step fraud scenarios: each episode contains 5 three-step chains "
+        "(SMS alert → phishing link → OTP request). Agent must track signal escalation."
+    ),
+    "difficulty": "hard",
+    "passing_threshold": 0.55,
+    "samples": HARD_MULTI_STEP_SAMPLES,
+}

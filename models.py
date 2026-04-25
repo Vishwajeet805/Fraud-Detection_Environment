@@ -115,7 +115,9 @@ class FraudReward(BaseModel):
     correct: bool = Field(description="Whether the action was the optimal choice.")
     partial: bool = Field(description="Whether partial credit was awarded.")
     explanation: str = Field(description="Human-readable reward explanation.")
-
+    money_saved: float   = Field(default=0.0, description="INR saved by correctly catching fraud.")
+    money_lost: float    = Field(default=0.0, description="INR lost by missing fraud (false negative).")
+    money_at_risk: float = Field(default=0.0, description="INR flagged under review (Suspicious action).")
 
 # ---------------------------------------------------------------------------
 # Step result & State

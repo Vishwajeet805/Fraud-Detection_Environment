@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fraud Simulation Experience</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #07090f;
+  --s1:       #0d1120;
+  --s2:       #111827;
+  --b1:       #1e2740;
+  --b2:       #2a3554;
+  --txt:      #e4eaf8;
+  --muted:    #6b7a99;
+  --dim:      #3a4460;
+
+  --fraud:    #e8394a;
+  --fraud-bg: #200a0d;
+  --fraud-b:  #5c1520;
+  --susp:     #f0a500;
+  --susp-bg:  #1e1400;
+  --susp-b:   #5a3c00;
+  --safe:     #22c97a;
+  --safe-bg:  #071a10;
+  --safe-b:   #0f4a28;
+
+  --accent:   #4f7ef8;
+  --r: 12px;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--txt);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  min-height: 100vh;
+}
+
+/* ── TOPBAR ── */
+.top {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 32px;
+  border-bottom: 1px solid var(--b1);
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(7,9,15,0.92);
+  backdrop-filter: blur(12px);
+}
+.logo {
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.05rem;
+  letter-spacing: -.3px; color: #fff; display: flex; align-items: center; gap: 10px;
+}
+.logo-shield {
+  width: 30px; height: 30px; background: linear-gradient(135deg, var(--accent), #7c4df8);
+  border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px;
+}
+.top-pill {
+  font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px;
+  border: 1px solid var(--b2); color: var(--muted); background: var(--s1); letter-spacing: .4px;
+}
+.top-pill.live { color: var(--safe); border-color: var(--safe); background: var(--safe-bg); }
+.top-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+
+/* ── LAYOUT ── */
+.shell {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  min-height: calc(100vh - 57px);
+}
+
+/* ── LEFT SIDEBAR (INPUT) ── */
+.sidebar {
+  border-right: 1px solid var(--b1);
+  padding: 24px 22px;
+  display: flex; flex-direction: column; gap: 18px;
+  position: sticky; top: 57px; height: calc(100vh - 57px); overflow-y: auto;
+}
+.sidebar::-webkit-scrollbar { width: 3px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--b2); border-radius: 3px; }
+
+.sec-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.8px;
+  text-transform: uppercase; color: var(--dim);
+}
+
+label.field-lbl {
+  font-size: 11px; font-weight: 600; letter-spacing: .8px;
+  text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 6px;
+}
+
+textarea, input[type=text], select {
+  width: 100%; background: var(--s2); border: 1px solid var(--b1);
+  border-radius: 9px; color: var(--txt); font-family: 'DM Sans', sans-serif;
+  font-size: 13px; padding: 10px 13px; outline: none;
+  transition: border-color .2s, box-shadow .2s; resize: none;
+}
+textarea { min-height: 100px; line-height: 1.55; }
+textarea::placeholder, input::placeholder { color: var(--dim); }
+textarea:focus, input:focus, select:focus {
+  border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,126,248,.12);
+}
+select option { background: var(--s2); }
+
+.ex-btns { display: flex; flex-direction: column; gap: 6px; }
+.ex-btn {
+  background: var(--s2); border: 1px solid var(--b1); border-radius: 9px;
+  color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 12px;
+  padding: 9px 13px; text-align: left; cursor: pointer; transition: all .15s;
+  display: flex; align-items: center; gap: 8px;
+}
+.ex-btn:hover { background: var(--b1); color: var(--txt); }
+.ex-btn.f:hover { border-color: var(--fraud); color: var(--fraud); background: var(--fraud-bg); }
+.ex-btn.s:hover { border-color: var(--susp); color: var(--susp); background: var(--susp-bg); }
+.ex-btn.g:hover { border-color: var(--safe); color: var(--safe); background: var(--safe-bg); }
+
+.analyze-btn {
+  width: 100%; background: linear-gradient(135deg, var(--accent), #6a3ef8);
+  border: none; border-radius: 11px; color: #fff;
+  font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700;
+  padding: 14px; letter-spacing: .4px; cursor: pointer; transition: all .2s; margin-top: 4px;
+}
+.analyze-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(79,126,248,.35); }
+.analyze-btn:active { transform: none; }
+
+/* ── RIGHT CONTENT ── */
+.content {
+  display: flex; flex-direction: column;
+  overflow-y: auto; height: calc(100vh - 57px);
+}
+.content::-webkit-scrollbar { width: 3px; }
+.content::-webkit-scrollbar-thumb { background: var(--b2); border-radius: 3px; }
+
+/* ── EMPTY STATE ── */
+.empty-full {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 16px;
+  color: var(--dim); text-align: center; padding: 60px 40px;
+}
+.empty-icon { font-size: 3rem; opacity: .25; }
+.empty-h { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--b2); }
+.empty-p { font-size: 13px; color: var(--dim); max-width: 320px; line-height: 1.6; }
+
+/* ── DECISION BANNER ── */
+.banner {
+  margin: 0; padding: 40px 48px;
+  border-bottom: 1px solid var(--b1);
+  display: none; flex-direction: column; gap: 20px;
+  transition: all .4s;
+  position: relative; overflow: hidden;
+}
+.banner::before {
+  content: '';
+  position: absolute; inset: 0;
+  opacity: 0;
+  transition: opacity .4s;
+  pointer-events: none;
+}
+.banner.fraud { background: var(--fraud-bg); border-color: var(--fraud-b); display: flex; }
+.banner.fraud::before { background: radial-gradient(ellipse at 80% 0%, rgba(232,57,74,.12) 0%, transparent 70%); opacity: 1; }
+.banner.susp  { background: var(--susp-bg);  border-color: var(--susp-b);  display: flex; }
+.banner.susp::before  { background: radial-gradient(ellipse at 80% 0%, rgba(240,165,0,.10) 0%, transparent 70%); opacity: 1; }
+.banner.safe  { background: var(--safe-bg);  border-color: var(--safe-b);  display: flex; }
+.banner.safe::before  { background: radial-gradient(ellipse at 80% 0%, rgba(34,201,122,.10) 0%, transparent 70%); opacity: 1; }
+
+.banner-top { display: flex; align-items: flex-start; gap: 24px; flex-wrap: wrap; }
+.banner-verdict { flex: 1; min-width: 200px; }
+
+.verdict-eyebrow {
+  font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--dim); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+}
+.verdict-eyebrow::before {
+  content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--dim);
+}
+.banner.fraud .verdict-eyebrow::before { background: var(--fraud); box-shadow: 0 0 8px var(--fraud); }
+.banner.susp  .verdict-eyebrow::before { background: var(--susp); box-shadow: 0 0 8px var(--susp); }
+.banner.safe  .verdict-eyebrow::before { background: var(--safe); box-shadow: 0 0 8px var(--safe); }
+
+.verdict-big {
+  font-family: 'Syne', sans-serif; font-size: 3rem; font-weight: 800;
+  line-height: 1; letter-spacing: -1px; color: var(--dim);
+}
+.banner.fraud .verdict-big { color: var(--fraud); }
+.banner.susp  .verdict-big { color: var(--susp); }
+.banner.safe  .verdict-big { color: var(--safe); }
+
+.verdict-sub {
+  font-size: 14px; color: var(--muted); margin-top: 10px; max-width: 380px; line-height: 1.5;
+}
+
+.banner-metrics {
+  display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-start;
+}
+
+.metric-chip {
+  background: rgba(255,255,255,.04); border: 1px solid var(--b1);
+  border-radius: 14px; padding: 16px 20px; min-width: 120px; text-align: center;
+}
+.metric-chip.fraud-chip { border-color: var(--fraud-b); background: rgba(232,57,74,.08); }
+.metric-chip.susp-chip  { border-color: var(--susp-b);  background: rgba(240,165,0,.08); }
+.metric-chip.safe-chip  { border-color: var(--safe-b);  background: rgba(34,201,122,.08); }
+
+.chip-val {
+  font-family: 'IBM Plex Mono', monospace; font-size: 1.6rem; font-weight: 500;
+  color: var(--dim); display: block; margin-bottom: 4px;
+}
+.fraud-chip .chip-val { color: var(--fraud); }
+.susp-chip  .chip-val { color: var(--susp); }
+.safe-chip  .chip-val { color: var(--safe); }
+.chip-lbl { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+
+/* Risk bar */
+.risk-bar-wrap { display: flex; flex-direction: column; gap: 8px; }
+.risk-bar-track {
+  height: 5px; background: var(--b1); border-radius: 3px; overflow: hidden;
+}
+.risk-bar-fill {
+  height: 100%; border-radius: 3px; width: 0%; transition: width .8s cubic-bezier(.4,0,.2,1);
+}
+.banner.fraud .risk-bar-fill { background: linear-gradient(90deg, #8b1a26, var(--fraud)); }
+.banner.susp  .risk-bar-fill { background: linear-gradient(90deg, #8b6000, var(--susp)); }
+.banner.safe  .risk-bar-fill { background: linear-gradient(90deg, #0a5c35, var(--safe)); }
+.risk-nums { display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--dim); }
+
+/* ── BODY SECTIONS ── */
+.body-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 0; border-bottom: 1px solid var(--b1);
+}
+
+.body-section {
+  padding: 32px 40px; border-right: 1px solid var(--b1);
+}
+.body-section:last-child { border-right: none; }
+
+.bs-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--dim); margin-bottom: 20px;
+  display: flex; align-items: center; gap: 8px;
+}
+.bs-label span { font-size: 14px; }
+
+/* Outcome sim */
+.outcome-cards { display: flex; flex-direction: column; gap: 10px; }
+.outcome-card {
+  border-radius: 12px; padding: 16px 18px; border: 1px solid var(--b1); background: var(--s2);
+  display: flex; align-items: center; gap: 14px;
+}
+.outcome-card.loss  { border-color: var(--fraud-b); background: var(--fraud-bg); }
+.outcome-card.saved { border-color: var(--safe-b);  background: var(--safe-bg); }
+.outcome-card.watch { border-color: var(--susp-b);  background: var(--susp-bg); }
+.oc-icon { font-size: 22px; flex-shrink: 0; }
+.oc-label { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+.oc-amount { font-family: 'IBM Plex Mono', monospace; font-size: 1.3rem; font-weight: 500; }
+.outcome-card.loss  .oc-amount { color: var(--fraud); }
+.outcome-card.saved .oc-amount { color: var(--safe); }
+.outcome-card.watch .oc-amount { color: var(--susp); }
+.oc-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* Explanation */
+.explain-para {
+  font-size: 15px; line-height: 1.8; color: var(--txt);
+}
+.explain-highlight {
+  display: inline-block; font-weight: 600; padding: 1px 6px; border-radius: 4px;
+  font-size: 13px; margin: 0 2px;
+}
+.h-fraud { color: var(--fraud); background: var(--fraud-bg); }
+.h-susp  { color: var(--susp);  background: var(--susp-bg); }
+.h-safe  { color: var(--safe);  background: var(--safe-bg); }
+
+/* Recommended actions */
+.action-items { display: flex; flex-direction: column; gap: 8px; }
+.action-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px; border-radius: 10px;
+  border: 1px solid var(--b1); background: var(--s2);
+  cursor: default; transition: all .15s;
+}
+.action-item:hover { border-color: var(--b2); background: var(--b1); }
+.action-icon { font-size: 18px; flex-shrink: 0; }
+.action-text { flex: 1; }
+.action-title { font-weight: 600; font-size: 14px; color: var(--txt); margin-bottom: 2px; }
+.action-desc  { font-size: 12px; color: var(--muted); }
+.action-badge {
+  font-size: 10px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase;
+  padding: 3px 9px; border-radius: 20px;
+}
+.ab-high   { background: var(--fraud-bg); color: var(--fraud); border: 1px solid var(--fraud-b); }
+.ab-med    { background: var(--susp-bg);  color: var(--susp);  border: 1px solid var(--susp-b); }
+.ab-low    { background: var(--safe-bg);  color: var(--safe);  border: 1px solid var(--safe-b); }
+
+/* ── STORY TIMELINE ── */
+.story-section { padding: 32px 40px; border-top: 1px solid var(--b1); }
+
+.story-steps { display: flex; flex-direction: column; gap: 0; margin-top: 20px; }
+
+.story-step {
+  display: flex; gap: 20px; opacity: .3; transition: opacity .3s;
+}
+.story-step.active { opacity: 1; }
+
+.ss-left {
+  display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 36px;
+}
+.ss-node {
+  width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--b2);
+  background: var(--s1); display: flex; align-items: center; justify-content: center;
+  font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; color: var(--dim);
+  flex-shrink: 0; z-index: 1; transition: all .3s;
+}
+.story-step.active .ss-node.fraud { border-color: var(--fraud); color: var(--fraud); background: var(--fraud-bg); box-shadow: 0 0 14px rgba(232,57,74,.25); }
+.story-step.active .ss-node.susp  { border-color: var(--susp);  color: var(--susp);  background: var(--susp-bg);  box-shadow: 0 0 14px rgba(240,165,0,.2); }
+.story-step.active .ss-node.safe  { border-color: var(--safe);  color: var(--safe);  background: var(--safe-bg);  box-shadow: 0 0 14px rgba(34,201,122,.2); }
+.ss-line { width: 2px; flex: 1; background: var(--b1); min-height: 28px; }
+
+.ss-content { flex: 1; padding: 4px 0 28px; }
+.ss-step-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--dim); margin-bottom: 8px;
+}
+.ss-story { font-size: 16px; font-weight: 500; color: var(--muted); margin-bottom: 8px; line-height: 1.5; }
+.story-step.active .ss-story { color: var(--txt); }
+.ss-msg-box {
+  background: var(--s2); border: 1px solid var(--b1); border-radius: 10px;
+  padding: 12px 15px; font-size: 13px; color: var(--muted); line-height: 1.6;
+  font-style: italic; margin-bottom: 8px;
+}
+.story-step.active .ss-msg-box { color: var(--txt); }
+.ss-verdict-line {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 12px; color: var(--dim);
+}
+.ss-mini-badge {
+  font-size: 10px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 20px;
+}
+.ssb-fraud { background: var(--fraud-bg); color: var(--fraud); border: 1px solid var(--fraud-b); }
+.ssb-susp  { background: var(--susp-bg);  color: var(--susp);  border: 1px solid var(--susp-b); }
+.ssb-safe  { background: var(--safe-bg);  color: var(--safe);  border: 1px solid var(--safe-b); }
+
+/* Fade in */
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+.fade-up { animation: fadeUp .35s ease forwards; }
+
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="top">
+  <div class="logo">
+    <div class="logo-shield">🛡️</div>
+    Fraud Decision Intelligence
+  </div>
+  <span class="top-pill">OpenEnv v0.2</span>
+  <span class="top-pill">FastAPI</span>
+  <div class="top-right">
+    <span class="top-pill live">● Live</span>
+  </div>
+</header>
+
+<div class="shell">
+
+  <!-- ════════════════════ LEFT: INPUT ════════════════════ -->
+  <aside class="sidebar">
+
+    <div class="sec-label">Scenario Input</div>
+
+    <div>
+      <label class="field-lbl">Message</label>
+      <textarea id="msgInput" placeholder="Paste the suspicious message…"></textarea>
+    </div>
+
+    <div>
+      <label class="field-lbl">URL</label>
+      <input type="text" id="urlInput" placeholder="https://example.com/verify">
+    </div>
+
+    <div>
+      <label class="field-lbl">Sender</label>
+      <input type="text" id="senderInput" placeholder="alerts@bank.com  or  SBI-OTP">
+    </div>
+
+    <div>
+      <label class="field-lbl">User Profile</label>
+      <select id="profile">
+        <option value="naive">Naive — First-time user</option>
+        <option value="normal" selected>Normal — Regular user</option>
+        <option value="expert">Expert — Security analyst</option>
+      </select>
+    </div>
+
+    <div>
+      <div class="sec-label" style="margin-bottom:10px;">Quick Scenarios</div>
+      <div class="ex-btns">
+        <button class="ex-btn f" onclick="load('fraud1')">🚨 "Win ₹10,000 now — click immediately!"</button>
+        <button class="ex-btn f" onclick="load('fraud2')">🚨 "Account blocked — send OTP now"</button>
+        <button class="ex-btn s" onclick="load('susp1')">⚠️ "SBI sign-in from new device"</button>
+        <button class="ex-btn s" onclick="load('susp2')">⚠️ "IT Dept refund — confirm details"</button>
+        <button class="ex-btn g" onclick="load('safe1')">✅ SBI OTP — legitimate login</button>
+        <button class="ex-btn g" onclick="load('safe2')">✅ Amazon order shipped</button>
+      </div>
+    </div>
+
+    <button class="analyze-btn" onclick="run()">Simulate Decision</button>
+
+  </aside>
+
+  <!-- ════════════════════ RIGHT: OUTPUT ════════════════════ -->
+  <main class="content" id="content">
+
+    <!-- EMPTY -->
+    <div class="empty-full" id="emptyState">
+      <div class="empty-icon">🔎</div>
+      <div class="empty-h">No simulation running</div>
+      <div class="empty-p">Select a quick scenario or enter your own message, then click Simulate Decision.</div>
+    </div>
+
+    <!-- ── BANNER ── -->
+    <div class="banner" id="banner">
+      <div class="banner-top">
+        <div class="banner-verdict">
+          <div class="verdict-eyebrow" id="vEyebrow">Awaiting input</div>
+          <div class="verdict-big" id="vBig">—</div>
+          <div class="verdict-sub" id="vSub">—</div>
+          <div style="margin-top:18px;" class="risk-bar-wrap">
+            <div class="risk-bar-track"><div class="risk-bar-fill" id="riskFill"></div></div>
+            <div class="risk-nums"><span>0</span><span>25</span><span>50</span><span>75</span><span>100</span></div>
+          </div>
+        </div>
+        <div class="banner-metrics">
+          <div class="metric-chip" id="chip1">
+            <span class="chip-val" id="chipVal1">—</span>
+            <span class="chip-lbl" id="chipLbl1">Risk Score</span>
+          </div>
+          <div class="metric-chip" id="chip2">
+            <span class="chip-val" id="chipVal2">—</span>
+            <span class="chip-lbl">Signals</span>
+          </div>
+          <div class="metric-chip" id="chip3">
+            <span class="chip-val" id="chipVal3">—</span>
+            <span class="chip-lbl">Confidence</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BODY GRID ── -->
+    <div class="body-grid" id="bodyGrid" style="display:none;">
+
+      <!-- Outcome Simulation -->
+      <div class="body-section">
+        <div class="bs-label"><span>💸</span>Outcome Simulation</div>
+        <div class="outcome-cards" id="outcomeCards"></div>
+      </div>
+
+      <!-- Explanation -->
+      <div class="body-section">
+        <div class="bs-label"><span>🧠</span>Why this decision</div>
+        <div class="explain-para" id="explainPara">—</div>
+      </div>
+
+    </div>
+
+    <!-- Recommended Actions -->
+    <div class="body-grid" id="actionsGrid" style="display:none; border-top: 1px solid var(--b1);">
+      <div class="body-section">
+        <div class="bs-label"><span>✅</span>Recommended Actions</div>
+        <div class="action-items" id="actionItems"></div>
+      </div>
+      <!-- Signals -->
+      <div class="body-section">
+        <div class="bs-label"><span>📡</span>Detected Signals</div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;" id="signalArea"></div>
+      </div>
+    </div>
+
+    <!-- ── STORY TIMELINE ── -->
+    <div class="story-section" id="storySection" style="display:none;">
+      <div class="bs-label"><span>📖</span>How this fraud unfolds — Step by step</div>
+      <div class="story-steps" id="storySteps"></div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const EX = {
+  fraud1: { msg:"CONGRATULATIONS!!! You have WON ₹10,000!!! Click NOW to claim your prize before it EXPIRES!!!", url:"http://win-prize-now.xyz/claim", sender:"prize@lottery-free.xyz" },
+  fraud2: { msg:"Your bank account is BLOCKED. Send your ATM PIN and OTP immediately to unblock.", url:"http://sbi-secure-verify.tk/login", sender:"alert@sbi-secure-verify.tk" },
+  susp1:  { msg:"We noticed a sign-in to your SBI account from a new device in Hyderabad. If not you, verify credentials immediately.", url:"https://sbi-secure-login.co.in/verify?token=9f3a1bc", sender:"security@sbi-secure-login.co.in" },
+  susp2:  { msg:"Your income tax refund of ₹14,320 for FY 2023-24 is pending. Confirm your bank account to receive it.", url:"https://efiling-incometax.co.in/refund-resubmit", sender:"refunds@efiling-incometax.co.in" },
+  safe1:  { msg:"Your OTP for SBI Net Banking login is 482910. Valid for 5 minutes. Do not share with anyone.", url:"", sender:"SBI-OTP" },
+  safe2:  { msg:"Your Amazon order #405-1234567-8901234 has been shipped. Delivery expected by tomorrow.", url:"https://www.amazon.in/orders", sender:"shipment-tracking@amazon.in" },
+};
+
+const STORIES = {
+  fraud1: [
+    { verdict:'fraud', story:"You receive an unsolicited message promising an unexpected prize.", msg:"CONGRATULATIONS!!! You've WON ₹10,000! Claim before it EXPIRES!!!", signal:"All-caps urgency with prize bait. No prior transaction." },
+    { verdict:'fraud', story:"You are directed to a suspicious link to 'claim' your reward.", msg:"Click http://win-prize-now.xyz/claim — your prize expires in 10 minutes!", signal:"Domain ends in .xyz — free, unverifiable. Classic phishing pattern." },
+    { verdict:'fraud', story:"You are asked to share your OTP to 'complete the transfer'.", msg:"Enter the OTP sent to your mobile to receive ₹10,000 now.", signal:"OTP harvest — final credential theft stage. Never share OTP." },
+  ],
+  fraud2: [
+    { verdict:'susp',  story:"You receive an alert about account activity from an unfamiliar number.", msg:"We detected unusual login activity on your SBI account.", signal:"Phone sender unverifiable. Possible legitimate alert or spoofed." },
+    { verdict:'fraud', story:"You're sent a link to 'verify' — but the domain isn't SBI's real domain.", msg:"Verify at sbi-secure-verify.tk to prevent your account from being blocked.", signal:"sbi-secure-verify.tk ≠ sbi.co.in. Domain impersonation confirmed." },
+    { verdict:'fraud', story:"You are asked for your PIN and OTP — banks never ask this.", msg:"Send your ATM PIN and OTP immediately to restore access.", signal:"Banks never request PIN via message. This is the theft stage." },
+  ],
+  susp1: [
+    { verdict:'susp',  story:"You get a plausible security alert — new device sign-in noticed.", msg:"SBI: We noticed a sign-in from a new device in Hyderabad. Not you?", signal:"Short-code sender is plausible. No link yet — watch phase." },
+    { verdict:'fraud', story:"A follow-up asks you to verify via a link — using a fake domain.", msg:"Verify at sbi-secure-login.co.in to prevent unauthorised transactions.", signal:"sbi-secure-login.co.in is not sbi.co.in — domain impersonation." },
+    { verdict:'fraud', story:"Finally you're prompted for an OTP — completing the attack chain.", msg:"Enter OTP to restore full account access on the secure page.", signal:"OTP capture on fraudulent domain — identity theft complete." },
+  ],
+  susp2: [
+    { verdict:'susp',  story:"You receive a refund notification via a mobile number — unusual channel.", msg:"IT Dept: Your refund of ₹14,320 is pending. Keep details ready.", signal:"IT Dept communicates via incometax.gov.in, not phone numbers." },
+    { verdict:'fraud', story:"You're redirected to a fake government portal that looks convincing.", msg:"Re-submit your account at efiling-incometax.co.in to receive your refund.", signal:"Real portal is incometax.gov.in — this is a lookalike domain." },
+    { verdict:'fraud', story:"OTP is requested to 'verify' — completing the data theft.", msg:"Enter OTP to confirm account for refund credit transfer.", signal:"OTP harvest on fraudulent portal — final stage of attack." },
+  ],
+  safe1: [
+    { verdict:'safe', story:"You initiated a login on SBI net banking from your usual device.", msg:"OTP for SBI Net Banking: 482910. Valid for 5 minutes.", signal:"Sender SBI-OTP is a trusted short code. No link, no request." },
+    { verdict:'safe', story:"The login succeeds — no unusual signals or redirects involved.", msg:"Login successful. Account accessed from your registered device.", signal:"All signals nominal. Transaction within expected patterns." },
+    { verdict:'safe', story:"You receive a routine session summary — standard bank communication.", msg:"Session ended. Activity summary sent to your registered email.", signal:"Routine post-login notification. No financial risk detected." },
+  ],
+  safe2: [
+    { verdict:'safe', story:"You placed an order and receive a shipping confirmation email.", msg:"Amazon: Your order #405-1234567-8901234 has been shipped.", signal:"Sender @amazon.in is a verified trusted domain." },
+    { verdict:'safe', story:"A delivery update follows with no suspicious links or requests.", msg:"Out for delivery: Your Amazon package will arrive today.", signal:"No financial request. Link goes to amazon.in — trusted." },
+    { verdict:'safe', story:"Order delivered — a standard feedback request arrives.", msg:"Delivered! Rate your experience and get ₹20 off next order.", signal:"Routine post-delivery notification. No risk signals." },
+  ],
+};
+
+function load(key) {
+  const e = EX[key];
+  document.getElementById('msgInput').value = e.msg;
+  document.getElementById('urlInput').value = e.url;
+  document.getElementById('senderInput').value = e.sender;
+}
+
+function classify(msg, url, sender) {
+  const ml = msg.toLowerCase(), ul = (url||'').toLowerCase(), sl = (sender||'').toLowerCase();
+  const urgW = ['urgent','immediately','now','expire','suspended','blocked','deactivate','alert','asap','won','congratul'];
+  const finW = ['bank','account','otp','pin','payment','transfer','kyc','refund','loan','tax','upi','credit card','aadhaar'];
+  const suspD = ['.xyz','.tk','.ml','.cf','.gq','.pw'];
+  const trusted = ['sbi.co.in','hdfcbank.com','icicibank.com','amazon.in','amazon.com','goindigo.in','irctc.co.in','zomato.com','epfindia.gov.in','incometax.gov.in','uidai.gov.in','rbi.org.in','phonepe.com','swiggy.com'];
+  const hasUrg = urgW.some(w => ml.includes(w));
+  const hasFin = finW.some(w => ml.includes(w));
+  const hasLink = url && url.startsWith('http');
+  let domScore = 0, sendScore = 0.3;
+  if (url) {
+    let d = url.replace(/^https?:\/\//,'').split('/')[0].toLowerCase();
+    if (trusted.some(t => d===t||d.endsWith('.'+t))) domScore=0;
+    else {
+      if (suspD.some(s => d.endsWith(s))) domScore+=0.5;
+      domScore += (d.match(/-/g)||[]).length >= 2 ? 0.3 : (d.match(/-/g)||[]).length===1 ? 0.15 : 0;
+      ['sbi','icici','hdfc','axis','uidai','incometax','rbi'].forEach(b => { if(d.includes(b)) domScore+=0.4; });
+      domScore = Math.min(domScore,1);
+    }
+  }
+  if (!sender||sender.startsWith('+91')) sendScore=0.5;
+  else if (!sender.includes('@')) sendScore=0.1;
+  else {
+    const sd=(sender.split('@')[1]||'').toLowerCase();
+    if (trusted.some(t=>sd===t||sd.endsWith('.'+t))) sendScore=0;
+    else if (suspD.some(d=>sd.endsWith(d))) sendScore=0.9;
+    else if ((sd.match(/-/g)||[]).length>=2) sendScore=0.7;
+  }
+  let action;
+  if ((domScore>=0.8||sendScore>=0.8)&&(hasUrg||hasFin)) action=1;
+  else if (ml.includes('otp')&&ml.includes('pin')&&domScore>=0.4) action=1;
+  else if (domScore>=0.5||sendScore>=0.6) action=2;
+  else if (hasUrg&&hasFin&&hasLink) action=2;
+  else action=0;
+  const risk=Math.min(Math.round(domScore*40+sendScore*30+(hasUrg?10:0)+(hasFin?10:0)+(hasLink?10:0)),100);
+  const r=n=>Math.floor(Math.random()*(n[1]-n[0]+1))+n[0];
+  const saved=action===1?r([5000,20000]):0, lost=action===0&&domScore>0.5?r([10000,50000]):0, atRisk=action===2?r([1000,5000]):0;
+  const reasons=[];
+  if(hasUrg) reasons.push('urgent or threatening language');
+  if(hasFin) reasons.push('financial keywords (OTP, account, payment)');
+  if(domScore>0.6) reasons.push('a suspicious or spoofed domain');
+  if(sendScore>0.6) reasons.push('an untrusted or unknown sender');
+  if(hasLink) reasons.push('external links');
+  return { action, risk, saved, lost, atRisk, reasons, domScore, sendScore, hasUrg, hasFin, hasLink };
+}
+
+function fmt(n) { return '₹\u202f'+n.toLocaleString('en-IN'); }
+
+function run() {
+  const msg=document.getElementById('msgInput').value.trim();
+  if(!msg) return;
+  const url=document.getElementById('urlInput').value.trim();
+  const sender=document.getElementById('senderInput').value.trim();
+  const r=classify(msg,url,sender);
+
+  const cls = r.action===1?'fraud':r.action===2?'susp':'safe';
+  const CONF = { fraud:{ ey:'High-risk threat detected', big:'FRAUD DETECTED', sub:'This message shows strong indicators of a phishing or fraud attempt. Do not engage.' },
+                 susp: { ey:'Suspicious activity flagged', big:'SUSPICIOUS', sub:'Mixed signals detected. This message requires closer review before any action is taken.' },
+                 safe: { ey:'No threat detected', big:'SAFE', sub:'No strong fraud indicators found. This message appears to be a legitimate communication.' } };
+  const v=CONF[cls];
+
+  document.getElementById('emptyState').style.display='none';
+  const banner=document.getElementById('banner');
+  banner.className='banner '+cls+' fade-up';
+  document.getElementById('vEyebrow').textContent=v.ey;
+  document.getElementById('vBig').textContent=v.big;
+  document.getElementById('vSub').textContent=v.sub;
+  setTimeout(()=>document.getElementById('riskFill').style.width=r.risk+'%',80);
+
+  const chipCls = cls+'-chip';
+  ['chip1','chip2','chip3'].forEach(id=>document.getElementById(id).className='metric-chip '+chipCls);
+  document.getElementById('chipVal1').textContent=r.risk;
+  document.getElementById('chipLbl1').textContent='Risk Score';
+  document.getElementById('chipVal2').textContent=[r.hasUrg,r.hasFin,r.hasLink,r.domScore>.6,r.sendScore>.6].filter(Boolean).length+'/5';
+  document.getElementById('chipVal3').textContent=r.risk>70?'High':r.risk>40?'Medium':'Low';
+
+  // Outcome cards
+  const oc=document.getElementById('outcomeCards');
+  oc.innerHTML='';
+  if(r.action===1) {
+    oc.innerHTML=`
+      <div class="outcome-card loss"><div class="oc-icon">⚠️</div><div><div class="oc-label">If ignored</div><div class="oc-amount">${fmt(r.saved)} potential loss</div><div class="oc-desc">User falls for the scam and loses funds.</div></div></div>
+      <div class="outcome-card saved"><div class="oc-icon">🛡️</div><div><div class="oc-label">If blocked now</div><div class="oc-amount">${fmt(r.saved)} saved</div><div class="oc-desc">Immediate block prevents any financial loss.</div></div></div>
+      <div class="outcome-card watch"><div class="oc-icon">🔍</div><div><div class="oc-label">If investigated</div><div class="oc-amount">Report & escalate</div><div class="oc-desc">Flag the sender — may protect other users too.</div></div></div>`;
+  } else if(r.action===2) {
+    oc.innerHTML=`
+      <div class="outcome-card watch"><div class="oc-icon">⏸️</div><div><div class="oc-label">Amount at risk</div><div class="oc-amount">${fmt(r.atRisk)}</div><div class="oc-desc">Transaction held pending review.</div></div></div>
+      <div class="outcome-card saved"><div class="oc-icon">🔎</div><div><div class="oc-label">If verified legitimate</div><div class="oc-amount">No action needed</div><div class="oc-desc">Resume after confirming with official source.</div></div></div>
+      <div class="outcome-card loss"><div class="oc-icon">🚨</div><div><div class="oc-label">If confirmed fraud</div><div class="oc-amount">Block immediately</div><div class="oc-desc">Escalate and report to the institution.</div></div></div>`;
+  } else {
+    oc.innerHTML=`
+      <div class="outcome-card saved"><div class="oc-icon">✅</div><div><div class="oc-label">Assessment</div><div class="oc-amount">No financial risk</div><div class="oc-desc">Message appears to be a legitimate communication.</div></div></div>
+      <div class="outcome-card watch"><div class="oc-icon">👀</div><div><div class="oc-label">Precaution</div><div class="oc-amount">Stay vigilant</div><div class="oc-desc">Always verify links independently before clicking.</div></div></div>`;
+  }
+
+  // Explanation paragraph
+  const ep=document.getElementById('explainPara');
+  const hc = `class="explain-highlight h-${cls}"`;
+  if(r.reasons.length) {
+    const last=r.reasons.pop();
+    const listed=r.reasons.length ? r.reasons.map(rr=>`<span ${hc}>${rr}</span>`).join(', ')+' and <span '+hc+'>'+last+'</span>' : `<span ${hc}>${last}</span>`;
+    ep.innerHTML=`This message was classified as <span ${hc}>${v.big}</span> because it contains ${listed}. ${
+      r.action===1 ? 'These are strong indicators of a coordinated phishing or fraud attempt. The combination of urgency, financial requests, and a spoofed domain matches known attack patterns.' :
+      r.action===2 ? 'While some signals are present, the evidence is not conclusive. A human review or direct verification with the institution is recommended before taking any action.' :
+      'None of the signals reached the threshold for a fraud or suspicious classification. The sender, domain, and message content all appear consistent with legitimate communication.'
+    }`;
+  } else {
+    ep.innerHTML=`This message was classified as <span class="explain-highlight h-safe">SAFE</span>. No urgency language, financial keywords, external links, or suspicious domains were detected. The communication appears to follow normal patterns for legitimate notifications.`;
+  }
+
+  // Actions
+  const ai=document.getElementById('actionItems');
+  if(r.action===1) {
+    ai.innerHTML=`
+      <div class="action-item"><div class="action-icon">🚫</div><div class="action-text"><div class="action-title">Block sender immediately</div><div class="action-desc">Prevent any further contact from this source.</div></div><span class="action-badge ab-high">Critical</span></div>
+      <div class="action-item"><div class="action-icon">⚠️</div><div class="action-text"><div class="action-title">Warn the user</div><div class="action-desc">Display a high-visibility alert before any action.</div></div><span class="action-badge ab-high">Critical</span></div>
+      <div class="action-item"><div class="action-icon">🌐</div><div class="action-text"><div class="action-title">Block the URL</div><div class="action-desc">Prevent access to the linked phishing domain.</div></div><span class="action-badge ab-high">Critical</span></div>
+      <div class="action-item"><div class="action-icon">📋</div><div class="action-text"><div class="action-title">Report to CERT-In</div><div class="action-desc">File a report with India's cybersecurity agency.</div></div><span class="action-badge ab-med">Recommended</span></div>`;
+  } else if(r.action===2) {
+    ai.innerHTML=`
+      <div class="action-item"><div class="action-icon">🔍</div><div class="action-text"><div class="action-title">Verify via official channel</div><div class="action-desc">Call the institution directly using their official number.</div></div><span class="action-badge ab-high">Priority</span></div>
+      <div class="action-item"><div class="action-icon">⏸️</div><div class="action-text"><div class="action-title">Pause any transaction</div><div class="action-desc">Do not send money or share credentials until verified.</div></div><span class="action-badge ab-med">Recommended</span></div>
+      <div class="action-item"><div class="action-icon">🌐</div><div class="action-text"><div class="action-title">Avoid the link</div><div class="action-desc">Navigate to the real website manually instead.</div></div><span class="action-badge ab-med">Recommended</span></div>`;
+  } else {
+    ai.innerHTML=`
+      <div class="action-item"><div class="action-icon">✅</div><div class="action-text"><div class="action-title">No action required</div><div class="action-desc">This appears to be a legitimate message.</div></div><span class="action-badge ab-low">Safe</span></div>
+      <div class="action-item"><div class="action-icon">👀</div><div class="action-text"><div class="action-title">Verify links manually</div><div class="action-desc">Always type URLs directly rather than clicking links.</div></div><span class="action-badge ab-low">Precaution</span></div>`;
+  }
+
+  // Signals
+  const sa=document.getElementById('signalArea');
+  const SIGS=[
+    ['Urgent language', r.hasUrg, 'fraud'],
+    ['Financial keywords', r.hasFin, 'susp'],
+    ['External link', r.hasLink, 'susp'],
+    ['Suspicious domain', r.domScore>0.6, 'fraud'],
+    ['Unknown sender', r.sendScore>0.6, 'fraud'],
+    ['Trusted sender', r.sendScore===0, 'safe'],
+    ['No external link', !r.hasLink, 'safe'],
+  ];
+  sa.innerHTML=SIGS.map(([lbl,on,type])=>`
+    <span style="font-size:11px; font-weight:600; padding:5px 12px; border-radius:20px; 
+      ${on ? `background:var(--${type}-bg); color:var(--${type}); border:1px solid var(--${type}-b);` 
+            : 'background:var(--s2); color:var(--dim); border:1px solid var(--b1);'}">
+      ${lbl}</span>`).join('');
+
+  document.getElementById('bodyGrid').style.display='grid';
+  document.getElementById('actionsGrid').style.display='grid';
+
+  // Find story key
+  let storyKey=null;
+  for(const[k,e] of Object.entries(EX)){if(e.msg===msg){storyKey=k;break;}}
+  const steps=storyKey?STORIES[storyKey]:buildStory(r,msg);
+  renderStory(steps);
+}
+
+function buildStory(r,msg) {
+  const cl=r.action===1?'fraud':r.action===2?'susp':'safe';
+  return [
+    { verdict:'susp', story:"You receive an initial contact — low signal but worth monitoring.", msg:"First message arrives with no obvious red flags.", signal:"Observation phase — context not yet clear." },
+    { verdict:cl, story:"Follow-up communication arrives with stronger fraud signals.", msg:msg, signal:r.reasons.length?r.reasons.join(', '):'No strong signals detected.' },
+    { verdict:r.action===1?'fraud':cl, story:r.action===1?"You are asked for OTP or credentials — the final theft step.":r.action===2?"No further escalation detected — outcome remains uncertain.":"Follow-up arrives with no suspicious content.", msg:r.action===1?"Enter OTP to complete the process on the secure page.":"No further action required.", signal:r.action===1?"Credential harvest — final attack stage. Do not comply.":"No escalation detected." },
+  ];
+}
+
+function renderStory(steps) {
+  const ss=document.getElementById('storySteps');
+  const BMAP={fraud:'ssb-fraud',susp:'ssb-susp',safe:'ssb-safe'};
+  const NMAP={fraud:'fraud',susp:'susp',safe:'safe'};
+  const BLAB={fraud:'Fraud',susp:'Suspicious',safe:'Safe'};
+  ss.innerHTML=steps.map((s,i)=>`
+    <div class="story-step active fade-up" style="animation-delay:${i*.1}s;">
+      <div class="ss-left">
+        <div class="ss-node ${NMAP[s.verdict]}">${i+1}</div>
+        ${i<steps.length-1?'<div class="ss-line"></div>':''}
+      </div>
+      <div class="ss-content">
+        <div class="ss-step-label">Step ${i+1} of ${steps.length}</div>
+        <div class="ss-story">${s.story}</div>
+        <div class="ss-msg-box">"${s.msg}"</div>
+        <div class="ss-verdict-line">
+          <span class="ss-mini-badge ${BMAP[s.verdict]}">${BLAB[s.verdict]}</span>
+          <span style="color:var(--muted); font-size:12px;">${s.signal}</span>
+        </div>
+      </div>
+    </div>`).join('');
+  document.getElementById('storySection').style.display='block';
+}
+</script>
+</body>
+</html>
