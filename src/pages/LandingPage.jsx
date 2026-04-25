@@ -5,30 +5,30 @@ import SectionHeader from '../components/SectionHeader'
 const features = [
   {
     title: 'Real-time fraud detection',
-    text: 'Analyze messages, URLs, and sender behavior in one low-latency decision surface.',
+    text: 'Low-latency scoring continuously evaluates messages, links, and sender context as incidents unfold.',
   },
   {
-    title: 'Sequential risk modeling',
-    text: 'Track fraud progression across multiple AI decision steps before taking action.',
+    title: 'Multi-step reasoning',
+    text: 'A deterministic decision chain reveals how the agent parses signals before classifying risk.',
   },
   {
-    title: 'Explainable AI reasoning',
-    text: 'Every decision includes concise reasoning and traceable signals for audit confidence.',
+    title: 'Explainable AI',
+    text: 'Every output includes auditable evidence and traceable rationale for analyst sign-off.',
   },
   {
-    title: 'Financial impact simulation',
-    text: 'Estimate saved capital, active exposure, and potential loss before fraud events escalate.',
+    title: 'Financial impact awareness',
+    text: 'Capital exposure and potential prevention outcomes are surfaced in the same decision surface.',
   },
 ]
 
 function LandingPage() {
   return (
     <div className="space-y-16 pb-10">
-      <section className="glass-card relative overflow-hidden px-8 py-16 md:px-12">
+      <section className="gradient-section glass-card relative overflow-hidden px-8 py-16 md:px-12">
         <motion.div
-          animate={{ opacity: [0.25, 0.45, 0.25] }}
-          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-accent/10 via-cyan-400/5 to-transparent"
+          animate={{ opacity: [0.18, 0.34, 0.18] }}
+          transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
+          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-accent/10 via-accentSoft/10 to-transparent"
         />
         <div className="relative">
           <p className="metric-label">Enterprise Fraud Operations</p>
@@ -36,15 +36,15 @@ function LandingPage() {
             AI Fraud Decision Intelligence
           </h2>
           <p className="mt-5 max-w-2xl text-base text-slate-300 md:text-lg">
-            Deploy multi-step AI analysis to identify fraudulent intent, explain every decision path, and quantify
-            financial exposure before losses compound.
+            Real-time agentic reasoning for fraud prevention. See how risk evolves, why decisions are made, and what
+            financial outcomes are at stake before damage compounds.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               to="/detect"
               className="rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-slate-950 transition hover:scale-[1.02]"
             >
-              Try Live Demo
+              Try Demo
             </Link>
             <Link
               to="/dashboard"
@@ -58,9 +58,9 @@ function LandingPage() {
 
       <section>
         <SectionHeader
-          eyebrow="Platform Capabilities"
-          title="Designed for decision velocity, not static scoring"
-          description="Built to mirror fintech-grade fraud operations where model output, reasoning, and capital impact are reviewed in one workflow."
+          eyebrow="Core Capabilities"
+          title="Designed for precision-led fraud operations"
+          description="The product experience mirrors modern fintech and cybersecurity teams where explainability and actionability matter as much as model output."
         />
 
         <div className="grid gap-4 md:grid-cols-2">
@@ -70,7 +70,8 @@ function LandingPage() {
               initial={{ opacity: 0, y: 14 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.4 }}
-              transition={{ duration: 0.35, delay: idx * 0.05 }}
+              transition={{ duration: 0.35, delay: idx * 0.06 }}
+              whileHover={{ y: -2 }}
               className="glass-card p-6"
             >
               <h3 className="text-lg font-semibold text-white">{feature.title}</h3>
@@ -79,6 +80,19 @@ function LandingPage() {
           ))}
         </div>
       </section>
+
+      <motion.section
+        className="gradient-section glass-card p-8"
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.35 }}
+        transition={{ duration: 0.4 }}
+      >
+        <p className="metric-label">Decision Layer</p>
+        <p className="mt-3 max-w-3xl text-xl font-medium text-white md:text-2xl">
+          Not a static classifier. A reasoning-first intelligence layer that simulates analyst judgment in real time.
+        </p>
+      </motion.section>
     </div>
   )
 }

@@ -4,19 +4,21 @@ export default {
   theme: {
     extend: {
       colors: {
-        base: '#060a12',
-        surface: '#0b1220',
-        panel: '#101a2b',
-        accent: '#1dd4bf',
-        alert: '#ef4444',
-        caution: '#f59e0b',
+        base: '#04070f',
+        surface: '#0a1020',
+        panel: '#0d1528',
+        accent: '#29d3ff',
+        accentSoft: '#7c8cff',
+        danger: '#ff5f7d',
+        warning: '#ffb86b',
       },
       boxShadow: {
-        soft: '0 10px 30px rgba(0, 0, 0, 0.25)',
+        soft: '0 20px 60px rgba(3, 7, 18, 0.52)',
+        glow: '0 0 0 1px rgba(41, 211, 255, 0.22), 0 30px 50px rgba(9, 26, 58, 0.5)',
       },
       backgroundImage: {
         'mesh-soft':
-          'radial-gradient(circle at 20% 20%, rgba(29, 212, 191, 0.10), transparent 40%), radial-gradient(circle at 80% 10%, rgba(56, 189, 248, 0.10), transparent 35%), radial-gradient(circle at 50% 80%, rgba(16, 185, 129, 0.08), transparent 40%)',
+          'radial-gradient(circle at 20% 15%, rgba(41, 211, 255, 0.08), transparent 32%), radial-gradient(circle at 82% 2%, rgba(124, 140, 255, 0.08), transparent 28%), radial-gradient(circle at 50% 84%, rgba(71, 85, 172, 0.08), transparent 34%)',
       },
     },
   },

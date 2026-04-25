@@ -3,24 +3,29 @@ import SectionHeader from '../components/SectionHeader'
 
 const steps = [
   {
-    title: 'Step 1: Input message',
-    icon: '✉️',
-    text: 'Ingest message text, sender identity, and destination URL from the transaction context.',
+    title: 'Agent',
+    icon: '🤖',
+    text: 'AI policy agent receives message context and prepares a decision strategy.',
   },
   {
-    title: 'Step 2: Feature extraction',
-    icon: '🧠',
-    text: 'Generate structured risk features from language intent, link intelligence, and reputation signals.',
+    title: 'Action',
+    icon: '⚡',
+    text: 'Agent classifies the input as Safe, Suspicious, or Fraud with confidence.',
   },
   {
-    title: 'Step 3: AI decision',
-    icon: '🛡️',
-    text: 'Run sequential policy logic to classify risk as Safe, Suspicious, or Fraud with calibrated confidence.',
+    title: 'Environment',
+    icon: '🌐',
+    text: 'Sender behavior, link intelligence, and language cues provide response context.',
   },
   {
-    title: 'Step 4: Reward + feedback',
+    title: 'Reward',
+    icon: '🎯',
+    text: 'Correct fraud prevention receives positive reward while misses reduce policy score.',
+  },
+  {
+    title: 'Learning',
     icon: '📈',
-    text: 'Feed outcomes into the reward loop to continuously improve risk containment and decision quality.',
+    text: 'Policy updates improve future decisions, reducing exposure and false positives over time.',
   },
 ]
 
@@ -29,11 +34,11 @@ function HowItWorksPage() {
     <div className="pb-8">
       <SectionHeader
         eyebrow="Workflow"
-        title="How the platform makes resilient fraud decisions"
-        description="A minimal four-step architecture designed for explainable, measurable, and continuously improving fraud defense."
+        title="How the intelligence loop works"
+        description="A minimal reinforcement pipeline: Agent → Action → Environment → Reward → Learning."
       />
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {steps.map((step, idx) => (
           <motion.article
             key={step.title}
@@ -41,8 +46,8 @@ function HowItWorksPage() {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.3, delay: idx * 0.07 }}
-            whileHover={{ y: -2 }}
+            transition={{ duration: 0.3, delay: idx * 0.06 }}
+            whileHover={{ y: -2, scale: 1.01 }}
           >
             <div className="flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-lg">

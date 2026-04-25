@@ -1,7 +1,7 @@
 const styles = {
-  Safe: 'bg-emerald-400/15 text-emerald-300 border-emerald-300/30',
-  Suspicious: 'bg-amber-400/15 text-amber-300 border-amber-300/30',
-  Fraud: 'bg-red-400/15 text-red-300 border-red-300/30',
+  Safe: 'bg-accent/15 text-accent border-accent/35',
+  Suspicious: 'bg-warning/15 text-warning border-warning/35',
+  Fraud: 'bg-danger/15 text-danger border-danger/35',
 }
 
 function RiskBadge({ level }) {
