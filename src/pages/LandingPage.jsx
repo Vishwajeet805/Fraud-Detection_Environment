@@ -33,8 +33,7 @@ function LandingPage() {
         <div className="relative">
           <p className="metric-label">Enterprise Fraud Operations</p>
           <h2 className="mt-3 max-w-3xl text-4xl font-semibold tracking-tight text-white md:text-5xl">
-            AI Fraud Decision Intelligence
-          </h2>
+            Stop Fraud Before It Happens</h2>
           <p className="mt-5 max-w-2xl text-base text-slate-300 md:text-lg">
             Real-time agentic reasoning for fraud prevention. See how risk evolves, why decisions are made, and what
             financial outcomes are at stake before damage compounds.

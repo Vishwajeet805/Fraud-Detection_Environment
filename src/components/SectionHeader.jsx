@@ -11,7 +11,14 @@ function SectionHeader({ eyebrow, title, description }) {
     >
       {eyebrow && <p className="mb-2 text-xs uppercase tracking-[0.22em] text-accent/90">{eyebrow}</p>}
       <h2 className="text-2xl font-semibold text-white md:text-3xl">{title}</h2>
-      {description && <p className="mt-2 max-w-2xl text-sm text-slate-300 md:text-base">{description}</p>}
+      {description && (
+        <p
+          className="mt-2 max-w-2xl text-sm md:text-base"
+          style={{ color: 'rgb(135 131 155 / 98%)' }}
+        >
+          {description}
+        </p>
+      )}
     </motion.div>
   )
 }

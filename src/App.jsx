@@ -39,7 +39,7 @@ function App() {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="text-xs uppercase tracking-[0.22em] text-slate-400">FraudShield AI</p>
-              <h1 className="text-lg font-semibold text-slate-100">Decision Intelligence Platform</h1>
+              <h1 className="text-lg font-semibold text-slate-100">Adaptive Fraud Intelligence System</h1>
             </div>
             <nav className="flex flex-wrap gap-2">
               {navItems.map((item) => (
