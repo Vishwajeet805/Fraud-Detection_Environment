@@ -50,67 +50,94 @@ function DetectionPage() {
   const BASE_URL = "";
 
   const runAnalysis = async () => {
-    if (!canAnalyze || isLoading) return
+  if (!canAnalyze || isLoading) return
 
-    setResult(null)
-    setIsLoading(true)
-    setActiveStep(-1)
+  setResult(null)
+  setIsLoading(true)
+  setActiveStep(-1)
 
-    try {
-      // Reset the environment
-      await fetch(`${BASE_URL}/reset`, { method: "POST" });
+  try {
+    // Reset environment — send user payload
+    await fetch(`${BASE_URL}/reset`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message_text: payload.message_text,
+        url: payload.url,
+        sender: payload.sender,
+      }),
+    })
 
-      // Set active steps for UI feedback
-      analysisSteps.forEach((_, index) => {
-        window.setTimeout(() => setActiveStep(index), index * 340)
-      })
+    // Animate thinking steps
+    analysisSteps.forEach((_, index) => {
+      window.setTimeout(() => setActiveStep(index), index * 340)
+    })
 
-      // Step with the payload
-      const stepResponse = await fetch(`${BASE_URL}/step`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: 1, // Assuming fraud detection action
-          confidence: 0.8,
-          reasoning: `Analyzing message: ${payload.message_text.substring(0, 100)}...`
-        })
-      });
+    // Determine action from message content (simple heuristic for UI)
+    const msg = payload.message_text.toLowerCase()
+    const fraudWords = ['otp', 'pin', 'urgent', 'won', 'prize', 'blocked',
+                        'click here', 'verify', 'expire', 'immediately',
+                        'aadhaar', 'pan', 'loan', 'fee', 'transfer']
+    const fraudScore = fraudWords.filter(w => msg.includes(w)).length
+    const action = fraudScore >= 3 ? 1 : fraudScore >= 1 ? 2 : 0
 
-      const stepData = await stepResponse.json();
+    // Call step with determined action
+    const stepResponse = await fetch(`${BASE_URL}/step`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action }),
+    })
 
-      // Get state for additional info
-      const stateResponse = await fetch(`${BASE_URL}/state`);
-      const stateData = await stateResponse.json();
-
-      // Format result for UI
-      const riskLevel = stepData.done ? (stepData.reward > 0 ? 'Safe' : 'Fraud') : 'Suspicious';
-      const confidence = Math.round(stepData.info?.confidence * 100) || 85;
-
-      setResult({
-        riskLevel,
-        confidence,
-        signals: stepData.info?.signals || ['Analysis complete'],
-        explanation: stepData.info?.explanation || ['Decision made based on message analysis'],
-        financial: {
-          saved: stepData.reward > 0 ? 324000 : 0,
-          risk: stepData.reward <= 0 ? 198000 : 0,
-          potentialLoss: stepData.reward <= 0 ? 271500 : 0
-        }
-      });
-
-    } catch (error) {
-      console.error('Analysis failed:', error);
-      setResult({
-        riskLevel: 'Error',
-        confidence: 0,
-        signals: ['Analysis failed'],
-        explanation: ['Unable to complete analysis. Please try again.'],
-        financial: { saved: 0, risk: 0, potentialLoss: 0 }
-      });
-    } finally {
-      setIsLoading(false);
+    if (!stepResponse.ok) {
+      throw new Error(`Server error: ${stepResponse.status}`)
     }
+
+    const stepData = await stepResponse.json()
+
+    // ── Map backend fields to UI — NO hardcoded values ──────────────────
+
+    // Risk level from backend label (0=Safe, 1=Fraud, 2=Suspicious)
+    const label = stepData.info?.label ?? action
+    const riskLevel = label === 0 ? 'Safe' : label === 1 ? 'Fraud' : 'Suspicious'
+
+    // Confidence from reward total (shaped to 1–99%)
+    const rewardTotal = stepData.reward?.total ?? 0
+    const absReward = Math.abs(rewardTotal)
+    const confidence = Math.min(99, Math.max(1, Math.round(absReward * 40 + 55)))
+
+    // Signals from backend obs_explanation array
+    const signals = Array.isArray(stepData.info?.obs_explanation)
+      ? stepData.info.obs_explanation
+      : ['Analysis complete']
+
+    // Explanation from backend explanation_text
+    const explanationText = stepData.info?.explanation_text
+      || stepData.info?.explanation
+      || 'Decision made based on message analysis'
+    const explanation = [explanationText]
+
+    // Financial from backend — these are the real values, never hardcoded
+    const financial = {
+      saved:         stepData.info?.money_saved   ?? 0,
+      risk:          stepData.info?.money_at_risk  ?? 0,
+      potentialLoss: stepData.info?.money_lost     ?? 0,
+    }
+
+    setResult({ riskLevel, confidence, signals, explanation, financial })
+
+  } catch (error) {
+    console.error('Analysis failed:', error)
+    setResult({
+      riskLevel: 'Error',
+      confidence: 0,
+      signals: ['Connection failed — is the server running?'],
+      explanation: [error.message || 'Unable to complete analysis. Please try again.'],
+      financial: { saved: 0, risk: 0, potentialLoss: 0 },
+    })
+  } finally {
+    setIsLoading(false)
   }
+}
 
   const financial = useMemo(() => result?.financial ?? { saved: 0, risk: 0, potentialLoss: 0 }, [result])
 
