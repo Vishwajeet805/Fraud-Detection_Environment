@@ -47,63 +47,69 @@ function DetectionPage() {
 
   const canAnalyze = payload.message_text.trim().length > 0
 
-  const runAnalysis = () => {
+  const BASE_URL = "";
+
+  const runAnalysis = async () => {
     if (!canAnalyze || isLoading) return
 
     setResult(null)
     setIsLoading(true)
     setActiveStep(-1)
 
-    analysisSteps.forEach((_, index) => {
-      window.setTimeout(() => setActiveStep(index), index * 340)
-    })
+    try {
+      // Reset the environment
+      await fetch(`${BASE_URL}/reset`, { method: "POST" });
 
-    window.setTimeout(() => {
-      const suspiciousScore =
-        (payload.message_text.match(/urgent|verify|gift|confidential|blocked|charges|otp|reset|invoice/gi) || []).length +
-        (payload.url ? 1 : 0) +
-        (payload.sender ? 1 : 0)
+      // Set active steps for UI feedback
+      analysisSteps.forEach((_, index) => {
+        window.setTimeout(() => setActiveStep(index), index * 340)
+      })
 
-      const riskLevel = suspiciousScore >= 3 ? 'Fraud' : suspiciousScore >= 2 ? 'Suspicious' : 'Safe'
-      const confidence = riskLevel === 'Fraud' ? 96 : riskLevel === 'Suspicious' ? 78 : 86
+      // Step with the payload
+      const stepResponse = await fetch(`${BASE_URL}/step`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: 1, // Assuming fraud detection action
+          confidence: 0.8,
+          reasoning: `Analyzing message: ${payload.message_text.substring(0, 100)}...`
+        })
+      });
 
-      const signals = [
-        suspiciousScore > 0 ? 'urgency' : 'neutral tone',
-        payload.url ? 'suspicious link' : 'no link provided',
-        payload.sender ? 'sender mismatch' : 'unknown sender context',
-      ]
+      const stepData = await stepResponse.json();
+
+      // Get state for additional info
+      const stateResponse = await fetch(`${BASE_URL}/state`);
+      const stateData = await stateResponse.json();
+
+      // Format result for UI
+      const riskLevel = stepData.done ? (stepData.reward > 0 ? 'Safe' : 'Fraud') : 'Suspicious';
+      const confidence = Math.round(stepData.info?.confidence * 100) || 85;
 
       setResult({
         riskLevel,
         confidence,
-        signals,
-        explanation:
-          riskLevel === 'Fraud'
-            ? [
-                'Language pattern indicates pressure-based social engineering intent.',
-                'Signal correlation between message cues and sender context increases compromise likelihood.',
-                'Risk trajectory predicts immediate financial exposure if action is taken without verification.',
-              ]
-            : riskLevel === 'Suspicious'
-              ? [
-                  'Partial manipulation cues detected with uncertain sender reliability.',
-                  'Message requests action but lacks trustworthy contextual anchors.',
-                  'Recommended path: analyst review before execution.',
-                ]
-              : [
-                  'Message structure and tone do not match high-risk fraud archetypes.',
-                  'No severe intent escalation or anomalous destination behavior observed.',
-                  'Low expected near-term financial risk under current context.',
-                ],
-        financial:
-          riskLevel === 'Fraud'
-            ? { saved: 324000, risk: 198000, potentialLoss: 271500 }
-            : riskLevel === 'Suspicious'
-              ? { saved: 124000, risk: 72000, potentialLoss: 89000 }
-              : { saved: 34000, risk: 12000, potentialLoss: 7000 },
-      })
-      setIsLoading(false)
-    }, 2000)
+        signals: stepData.info?.signals || ['Analysis complete'],
+        explanation: stepData.info?.explanation || ['Decision made based on message analysis'],
+        financial: {
+          saved: stepData.reward > 0 ? 324000 : 0,
+          risk: stepData.reward <= 0 ? 198000 : 0,
+          potentialLoss: stepData.reward <= 0 ? 271500 : 0
+        }
+      });
+
+    } catch (error) {
+      console.error('Analysis failed:', error);
+      setResult({
+        riskLevel: 'Error',
+        confidence: 0,
+        signals: ['Analysis failed'],
+        explanation: ['Unable to complete analysis. Please try again.'],
+        financial: { saved: 0, risk: 0, potentialLoss: 0 }
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   const financial = useMemo(() => result?.financial ?? { saved: 0, risk: 0, potentialLoss: 0 }, [result])

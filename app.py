@@ -24,6 +24,9 @@ from typing import Any, Dict, Optional
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from env import FraudDetectionEnv
@@ -39,6 +42,15 @@ app = FastAPI(
         "Implements the full OpenEnv specification with step(), reset(), and state() endpoints."
     ),
     version="0.1.0",
+)
+
+# Enable CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Global environment registry (one env per task, lazy-initialized)
@@ -172,6 +184,15 @@ async def state(task_name: Optional[str] = None):
         return env_state.model_dump()
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
+
+
+# Serve static assets (JS/CSS)
+app.mount("/assets", StaticFiles(directory="dist/assets"), name="assets")
+
+# Root → index.html
+@app.get("/")
+async def serve_react():
+    return FileResponse("dist/index.html")
 
 
 # ── Exception handler ─────────────────────────────────────────────────────────
